@@ -1,7 +1,117 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  --bg: #0c0f14;
+  --surface: #141a23;
+  --surface-2: #1a2230;
+  --text: #e9eef5;
+  --muted: #9fb0c3;
+  --accent: #4cc9f0;
+  --accent-strong: #5ee1ff;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(1200px 800px at 20% 10%, #1c2636 0%, #0c0f14 55%, #090b10 100%);
+  color: var(--text);
+}
+
+.app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 96px;
+}
+
 .header {
-  
-  text-align: center;
-  background: #070707;
-  color: white;
+  padding: 20px 24px;
+  border-bottom: 1px solid #1d2532;
+  background: rgba(20, 26, 35, 0.6);
+  backdrop-filter: blur(6px);
+}
+
+.header h1 {
+  margin: 0;
   font-size: 20px;
+  letter-spacing: 0.4px;
+}
+
+.content {
+  flex: 1;
+  padding: 24px;
+  color: var(--muted);
+}
+
+.player-bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  height: 64px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid #202a3a;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.ctrl {
+  height: 42px;
+  width: 100%;
+  border: 1px solid #263246;
+  border-radius: 12px;
+  background: #111826;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.ctrl:hover {
+  transform: translateY(-1px);
+  border-color: #32405a;
+  background: #0f1a2b;
+}
+
+.ctrl--primary {
+  height: 48px;
+  background: linear-gradient(180deg, var(--accent-strong) 0%, var(--accent) 100%);
+  color: #071018;
+  font-size: 20px;
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(76, 201, 240, 0.35);
+}
+
+.ctrl--primary:hover {
+  background: linear-gradient(180deg, #7ee9ff 0%, #55d3f5 100%);
+}
+
+.ctrl--secondary {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+@media (max-width: 520px) {
+  .player-bar {
+    left: 8px;
+    right: 8px;
+    grid-template-columns: repeat(5, 1fr);
+  }
 }

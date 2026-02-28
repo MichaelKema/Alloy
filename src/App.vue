@@ -30,8 +30,11 @@ let playlistSeq = 1;
 
 const mediaTags = jsmediatags?.default ?? jsmediatags;
 
-const activePlaylist = computed(() =>
-  playlists.value.find((playlist) => playlist.id === activePlaylistId.value) || null,
+const activePlaylist = computed(
+  () =>
+    playlists.value.find(
+      (playlist) => playlist.id === activePlaylistId.value,
+    ) || null,
 );
 
 const activeTrackIds = computed(() => activePlaylist.value?.trackIds ?? []);
@@ -49,7 +52,9 @@ const currentTrack = computed(() =>
 );
 
 const nowPlaying = computed(() =>
-  currentTrack.value ? currentTrack.value.title || currentTrack.value.name : "No track loaded",
+  currentTrack.value
+    ? currentTrack.value.title || currentTrack.value.name
+    : "No track loaded",
 );
 
 function openFileDialog(mode = "playlist") {
@@ -100,12 +105,15 @@ function deleteActivePlaylist() {
   if (playlists.value.length <= 1 || !activePlaylist.value) return;
   const removedPlaylist = activePlaylist.value;
   const removedTrackIds = [...removedPlaylist.trackIds];
-  const nextList = playlists.value.filter((playlist) => playlist.id !== removedPlaylist.id);
+  const nextList = playlists.value.filter(
+    (playlist) => playlist.id !== removedPlaylist.id,
+  );
   playlists.value = nextList;
   activePlaylistId.value = nextList[0]?.id ?? null;
 
   const orphaned = removedTrackIds.filter(
-    (trackId) => !nextList.some((playlist) => playlist.trackIds.includes(trackId)),
+    (trackId) =>
+      !nextList.some((playlist) => playlist.trackIds.includes(trackId)),
   );
   addTracksToLibrary(orphaned);
 
@@ -170,7 +178,9 @@ function removeTrackFromLibrary(trackId) {
 }
 
 function isTrackInAnyPlaylist(trackId) {
-  return playlists.value.some((playlist) => playlist.trackIds.includes(trackId));
+  return playlists.value.some((playlist) =>
+    playlist.trackIds.includes(trackId),
+  );
 }
 
 function addFiles(fileList, { addToPlaylist = true } = {}) {
@@ -190,7 +200,10 @@ function addFiles(fileList, { addToPlaylist = true } = {}) {
       activePlaylistId.value = playlist.id;
     }
 
-    const nextTrackIds = [...playlist.trackIds, ...newTracks.map((track) => track.id)];
+    const nextTrackIds = [
+      ...playlist.trackIds,
+      ...newTracks.map((track) => track.id),
+    ];
     updatePlaylist(playlist.id, { trackIds: nextTrackIds });
   } else {
     addTracksToLibrary(newTracks.map((track) => track.id));
@@ -201,14 +214,19 @@ function addFiles(fileList, { addToPlaylist = true } = {}) {
   });
 
   if (!currentTrackId.value) {
-    setCurrentTrackById(newTracks[0].id, { shouldPlay: true, rebuildOrder: addToPlaylist });
+    setCurrentTrackById(newTracks[0].id, {
+      shouldPlay: true,
+      rebuildOrder: addToPlaylist,
+    });
   } else {
     rebuildPlayOrder();
   }
 }
 
 function onFileSelected(event) {
-  addFiles(event.target.files, { addToPlaylist: fileInputMode.value !== "library" });
+  addFiles(event.target.files, {
+    addToPlaylist: fileInputMode.value !== "library",
+  });
   event.target.value = "";
 }
 
@@ -216,7 +234,11 @@ function updateTrack(trackId, patch) {
   const existing = tracksById.value[trackId];
   if (!existing) return;
 
-  if ("coverUrl" in patch && existing.coverUrl && existing.coverUrl !== patch.coverUrl) {
+  if (
+    "coverUrl" in patch &&
+    existing.coverUrl &&
+    existing.coverUrl !== patch.coverUrl
+  ) {
     URL.revokeObjectURL(existing.coverUrl);
   }
 
@@ -239,7 +261,9 @@ function readMetadataForTrack(trackId, file) {
         const picture = tags?.picture;
         if (picture?.data?.length) {
           const byteArray = new Uint8Array(picture.data);
-          const blob = new Blob([byteArray], { type: picture.format || "image/jpeg" });
+          const blob = new Blob([byteArray], {
+            type: picture.format || "image/jpeg",
+          });
           next.coverUrl = URL.createObjectURL(blob);
         }
 
@@ -344,7 +368,10 @@ function setCurrentTrackById(
 }
 
 function selectTrack(trackId) {
-  setCurrentTrackById(trackId, { shouldPlay: true, rebuildOrder: isShuffling.value });
+  setCurrentTrackById(trackId, {
+    shouldPlay: true,
+    rebuildOrder: isShuffling.value,
+  });
 }
 
 function toggleShuffle() {
@@ -355,7 +382,10 @@ function toggleShuffle() {
 function playNext() {
   if (!playOrder.value.length) return;
   if (orderPosition.value < 0) {
-    setCurrentTrackById(playOrder.value[0], { shouldPlay: true, skipOrderSync: true });
+    setCurrentTrackById(playOrder.value[0], {
+      shouldPlay: true,
+      skipOrderSync: true,
+    });
     orderPosition.value = 0;
     return;
   }
@@ -370,7 +400,10 @@ function playNext() {
 function playPrevious() {
   if (!playOrder.value.length) return;
   if (orderPosition.value < 0) {
-    setCurrentTrackById(playOrder.value[0], { shouldPlay: true, skipOrderSync: true });
+    setCurrentTrackById(playOrder.value[0], {
+      shouldPlay: true,
+      skipOrderSync: true,
+    });
     orderPosition.value = 0;
     return;
   }
@@ -384,7 +417,9 @@ function playPrevious() {
 
 function removeFromActivePlaylist(trackId) {
   if (!activePlaylist.value) return;
-  const nextTrackIds = activePlaylist.value.trackIds.filter((id) => id !== trackId);
+  const nextTrackIds = activePlaylist.value.trackIds.filter(
+    (id) => id !== trackId,
+  );
   updatePlaylist(activePlaylist.value.id, { trackIds: nextTrackIds });
   if (!isTrackInAnyPlaylist(trackId)) {
     addTracksToLibrary([trackId]);
@@ -392,7 +427,10 @@ function removeFromActivePlaylist(trackId) {
 
   if (currentTrackId.value === trackId) {
     if (nextTrackIds.length) {
-      setCurrentTrackById(nextTrackIds[0], { shouldPlay: false, rebuildOrder: true });
+      setCurrentTrackById(nextTrackIds[0], {
+        shouldPlay: false,
+        rebuildOrder: true,
+      });
     } else {
       clearCurrentTrack();
     }
@@ -496,12 +534,20 @@ onBeforeUnmount(() => {
     <header class="header">
       <div class="brand">Alloy.fm</div>
       <nav class="menu" aria-label="App menu">
-        <button class="menu-btn" type="button" @click="openFileDialog('playlist')">File ▾</button>
-        <button class="menu-btn" type="button" @click="openFileDialog('library')">
+        <button
+          class="menu-btn"
+          type="button"
+          @click="openFileDialog('playlist')"
+        >
+          File ▾
+        </button>
+        <button
+          class="menu-btn"
+          type="button"
+          @click="openFileDialog('library')"
+        >
           Library ▾
         </button>
-        <button class="menu-btn" type="button" aria-haspopup="true">Select ▾</button>
-        <button class="menu-btn" type="button" aria-haspopup="true">View ▾</button>
       </nav>
     </header>
 
@@ -514,7 +560,9 @@ onBeforeUnmount(() => {
               v-for="playlist in playlists"
               :key="playlist.id"
               class="playlist-tab"
-              :class="{ 'playlist-tab--active': playlist.id === activePlaylistId }"
+              :class="{
+                'playlist-tab--active': playlist.id === activePlaylistId,
+              }"
               type="button"
               @click="setActivePlaylist(playlist.id)"
             >
@@ -530,7 +578,13 @@ onBeforeUnmount(() => {
             type="text"
             placeholder="New playlist name"
           />
-          <button class="menu-btn" type="button" @click="createPlaylistFromInput">Create</button>
+          <button
+            class="menu-btn"
+            type="button"
+            @click="createPlaylistFromInput"
+          >
+            Create
+          </button>
           <input
             v-model="renamePlaylistName"
             class="playlist-input"
@@ -561,7 +615,11 @@ onBeforeUnmount(() => {
 
       <div class="meta-card" v-if="currentTrack">
         <div class="cover" :class="{ 'cover--empty': !currentTrack.coverUrl }">
-          <img v-if="currentTrack.coverUrl" :src="currentTrack.coverUrl" alt="Album art" />
+          <img
+            v-if="currentTrack.coverUrl"
+            :src="currentTrack.coverUrl"
+            alt="Album art"
+          />
           <div v-else class="cover-placeholder">♪</div>
         </div>
         <div class="meta-text">
@@ -593,7 +651,9 @@ onBeforeUnmount(() => {
         <div class="playlist-header">
           <div class="playlist-title">Library</div>
           <div class="playlist-count">
-            {{ libraryTracks.length }} track{{ libraryTracks.length === 1 ? "" : "s" }}
+            {{ libraryTracks.length }} track{{
+              libraryTracks.length === 1 ? "" : "s"
+            }}
           </div>
         </div>
         <div class="playlist-list">
@@ -632,9 +692,13 @@ onBeforeUnmount(() => {
 
       <div class="playlist" v-if="activeTracks.length">
         <div class="playlist-header">
-          <div class="playlist-title">{{ activePlaylist?.name || "Playlist" }}</div>
+          <div class="playlist-title">
+            {{ activePlaylist?.name || "Playlist" }}
+          </div>
           <div class="playlist-count">
-            {{ activeTracks.length }} track{{ activeTracks.length === 1 ? "" : "s" }}
+            {{ activeTracks.length }} track{{
+              activeTracks.length === 1 ? "" : "s"
+            }}
           </div>
         </div>
         <div class="playlist-list">
@@ -660,7 +724,11 @@ onBeforeUnmount(() => {
               </div>
             </div>
             <div class="track-time">{{ formatTime(track.duration) }}</div>
-            <button class="track-remove" type="button" @click.stop="removeFromActivePlaylist(track.id)">
+            <button
+              class="track-remove"
+              type="button"
+              @click.stop="removeFromActivePlaylist(track.id)"
+            >
               Remove
             </button>
           </div>
@@ -708,8 +776,14 @@ onBeforeUnmount(() => {
       </div>
       <div class="player-controls">
         <button class="ctrl ctrl--secondary" aria-label="Loop">⟲</button>
-        <button class="ctrl" aria-label="Previous" @click="playPrevious">⏮</button>
-        <button class="ctrl ctrl--primary" :aria-label="isPlaying ? 'Pause' : 'Play'" @click="togglePlay">
+        <button class="ctrl" aria-label="Previous" @click="playPrevious">
+          ⏮
+        </button>
+        <button
+          class="ctrl ctrl--primary"
+          :aria-label="isPlaying ? 'Pause' : 'Play'"
+          @click="togglePlay"
+        >
           {{ isPlaying ? "⏸" : "▶" }}
         </button>
         <button class="ctrl" aria-label="Next" @click="playNext">⏭</button>
